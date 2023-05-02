@@ -90,7 +90,7 @@ def index(request, _):
 
 
 def demo(request):
-    print(request.POST.data)
-
+    print(request.POST)
+    data = []
     return JsonResponse({'code': 0, 'data': data},
                         json_dumps_params={'ensure_ascii': False})
