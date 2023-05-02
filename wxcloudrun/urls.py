@@ -25,5 +25,6 @@ urlpatterns = (
     # url(r'(/)?$', views.index),
 
     # 获取主页
-    url(r'api/demo', views.demo),
+    url(r'api/demo?$', views.demo),
+    url(r'api/demo2?$', views.my_view),
 )
