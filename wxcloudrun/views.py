@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import time
@@ -6,7 +7,10 @@ from django.http import JsonResponse
 from django.shortcuts import render
 import xml.etree.ElementTree as ET
 from django.http import HttpResponse
-from wxcloudrun.util import chat, pack_msg, is_bilibili_link, get_bvId, bili_player_list, bili_subtitle, segTranscipt
+
+from wxcloudrun.models import BilibiliVideo
+from wxcloudrun.util import chat, pack_msg, is_bilibili_link, get_bvId, bili_player_list, bili_subtitle, segTranscipt, \
+    get_data
 
 logger = logging.getLogger('log')
 
@@ -62,34 +66,14 @@ def bili_summary(request):
         print("pass,url 错误")
     bvid = get_bvId(blink)
 
-    cid, title = bili_player_list(bvid)
-    transcript_text = bili_subtitle(bvid, cid)
-    summarized_text = ''
-    if transcript_text:
-        print('字幕获取成功')
-        seged_text = segTranscipt(transcript_text)
-        i = 1
-        print(seged_text)
-        for entry in seged_text:
-            try:
-                response = chat(entry)
-                print(response)
-                print(f'完成第{str(i)}部分摘要')
-                print()
-                i += 1
-            except  Exception as e:
-                print('GPT接口摘要失败, 请检查网络连接', e)
-                response = '摘要失败'
-            summarized_text += '\n' + response
-        # insert2notion(token, database_id, bvid, summarized_text)
+    if BilibiliVideo.objects.filter(bvid=bvid).exists():
+        summarized_text = BilibiliVideo.objects.get(bvid=bvid).summarized_text
+
+        xml_str = pack_msg(reply_info, summarized_text)
+
+        return HttpResponse(xml_str, content_type='application/xml')
     else:
-        print('字幕获取失败')
-
-    if not summarized_text:
-        summarized_text = '总结失败'
-
-    print(summarized_text)
-
-    xml_str = pack_msg(reply_info, summarized_text)
-
-    return HttpResponse(xml_str, content_type='application/xml')
+        # 异步任务，处理接收到的消息
+        get_data(reply_info)
+        time.sleep(3)
+        return HttpResponse('success')

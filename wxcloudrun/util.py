@@ -1,4 +1,5 @@
 import os
+import threading
 import time
 from urllib.parse import urlparse
 
@@ -6,6 +7,8 @@ import openai
 import requests
 import validators
 import xmltodict
+
+from wxcloudrun.models import BilibiliVideo
 
 headers = {
     "Cookie": "buvid3=624DC525-E7B5-0416-1735-7CD7AF68A3A245957infoc; i-wanna-go-back=-1; _uuid=D812FC103-1B8D-288E-A16A-D395A6581082645694infoc; buvid4=505CDFDF-0FEE-9CD2-F219-129A152C10CA46623-022071123-cWZGbE4cldom6m5ltwQ11A==; buvid_fp_plain=undefined; LIVE_BUVID=AUTO5716575551770605; CURRENT_BLACKGAP=0; DedeUserID=361453208; DedeUserID__ckMd5=4cb1e81e3095816d; nostalgia_conf=-1; blackside_state=0; b_ut=5; is-2022-channel=1; fingerprint3=adff839f4ad592c1c87e6205cb0ef759; hit-dyn-v2=1; b_nut=100; rpdid=|(k|k)~u|mYR0J'uYY)mullYu; CURRENT_QUALITY=120; header_theme_version=CLOSE; home_feed_column=5; CURRENT_FNVAL=4048; CURRENT_PID=d6815990-cf09-11ed-9502-f922cc9137c4; FEED_LIVE_VERSION=V8; browser_resolution=2560-1289; hit-new-style-dyn=0; bsource=search_baidu; fingerprint=606cee3cf376d013849ff9b45826538d; buvid_fp=606cee3cf376d013849ff9b45826538d; PVID=1; bp_video_offset_361453208=790810144955957200; b_lsid=31E107EA1_187E1669532; innersign=1; SESSDATA=e5a3fb70,1698666620,a4a5f*51; bili_jct=82382050fc93baec7f533ee817d829dc; sid=7mkgefpx"
@@ -39,6 +42,7 @@ def bili_tags(bvid):
 def bili_player_list(bvid):
     url = 'https://api.bilibili.com/x/player/pagelist?bvid=' + bvid
     response = requests.get(url)
+    print(url)
     cid_list = [x['cid'] for x in response.json()['data']]
     title = response.json()['data'][0]['part']
     return cid_list[0], title
@@ -86,6 +90,7 @@ def chat(text, ):
              '同时，请确保你所提供的摘要准确反映了原始文本中所述内容。'
     openai.api_key = os.environ.get("API_KEY")
     openai.api_base = os.environ.get("API_BASE")
+
     completions = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
         messages=[
@@ -131,3 +136,49 @@ def is_bilibili_link(link):
     # 判断域名是否为 bilibili.com
     if domain == 'www.bilibili.com' or domain == 'm.bilibili.com':
         return True
+
+
+def background_thread(func):
+    def wrapper(*args, **kwargs):
+        threading.Thread(target=func, args=args, kwargs=kwargs).start()
+
+    return wrapper
+
+
+@background_thread
+def get_data(reply_info):
+    blink = reply_info["Content"]
+    bvid = get_bvId(blink)
+
+    cid, title = bili_player_list(bvid)
+    transcript_text = bili_subtitle(bvid, cid)
+    summarized_text = ''
+    if transcript_text:
+        print('字幕获取成功')
+        seged_text = segTranscipt(transcript_text)
+        i = 1
+        print(seged_text)
+        for entry in seged_text:
+            try:
+                response = chat(entry)
+                print(response)
+                print(f'完成第{str(i)}部分摘要')
+                print()
+                i += 1
+            except  Exception as e:
+                print('GPT接口摘要失败, 请检查网络连接', e)
+                response = '摘要失败'
+            summarized_text += '\n' + response
+        # insert2notion(token, database_id, bvid, summarized_text)
+    else:
+        print('字幕获取失败')
+
+    if not summarized_text:
+        summarized_text = '总结失败-待处理'
+
+    BilibiliVideo.objects.update_or_create(defaults={
+        "creator": reply_info["ToUserName"],
+        "blink": blink,
+        "summarized_text": summarized_text
+    }, bvid=bvid)
+    return True

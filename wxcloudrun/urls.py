@@ -16,6 +16,8 @@ Including another URLconf
 
 from wxcloudrun import views
 from django.conf.urls import url
+from werobot.contrib.django import make_view
+
 
 urlpatterns = (
     # 计数器接口
