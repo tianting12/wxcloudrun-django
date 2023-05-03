@@ -25,12 +25,8 @@ def index(request, _):
 
 
 def demo(request):
-    da = json.loads(request.body)
-    print(da)
-    data = []
-
-    return JsonResponse({'code': 0, 'data': data},
-                        json_dumps_params={'ensure_ascii': False})
+    replyMsg = TextMsg("gh_937acfb6dd33", "oXaeL5lrrJ9Xc2TDsCQmVkWLh4Tc", "TEXT")
+    return HttpResponse(replyMsg.send(), content_type="application/xml")
 
 
 def my_view(request):
@@ -45,20 +41,20 @@ def bili_summary(request):
     reply_info = json.loads(request.body)
     print("reply_info", reply_info)
     if not reply_info or reply_info.get("action"):
-        return HttpResponse("success")
+        return HttpResponse("success",content_type="application/xml")
     blink = reply_info["Content"]
     check = is_bilibili_link(blink)
     if not check:
-        return HttpResponse("success")
+        return HttpResponse("success",content_type="application/xml")
     bvid = get_bvId(blink)
 
     if BilibiliVideo.objects.filter(bvid=bvid).exists():
         summarized_text = BilibiliVideo.objects.get(bvid=bvid).summarized_text
 
         replyMsg = TextMsg(reply_info["FromUserName"], reply_info["ToUserName"], summarized_text)
-        return HttpResponse(replyMsg.send())
+        return HttpResponse(replyMsg.send(), content_type="application/xml")
     else:
         # 异步任务，处理接收到的消息
         get_data(reply_info)
         time.sleep(2)
-        return HttpResponse('success')
+        return HttpResponse('success',content_type="application/xml")
