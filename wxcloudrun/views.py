@@ -48,6 +48,7 @@ def my_view(request):
     # 将XML元素树序列化为字符串
     xml_str = ET.tostring(xml_tree)
 
+    xml_str = pack_msg(da, "nihao")
     # 返回HTTP响应
     return HttpResponse(xml_str, content_type='application/xml')
 
