@@ -105,16 +105,16 @@ def chat(text, ):
 
 
 def pack_msg(reply_info: dict, msg: str) -> str:
-    resp_dict = {
-        "xml": {
-            'ToUserName': reply_info.get('FromUserName'),
-            'FromUserName': reply_info.get('ToUserName'),
-            'CreateTime': int(time.time()),
-            'MsgType': 'text',
-            'Content': msg
-        }
-    }
-    return xmltodict.unparse(resp_dict)
+    reply_xml = f'''
+                <xml>
+                    <ToUserName><![CDATA[{reply_info.get('FromUserName')}]]></ToUserName>
+                    <FromUserName><![CDATA[{reply_info.get('ToUserName')}]]></FromUserName>
+                    <CreateTime>{int(time.time())}</CreateTime>
+                    <MsgType><![CDATA[text]]></MsgType>
+                    <Content><![CDATA[{msg}]]></Content>
+                </xml>
+                '''
+    return reply_xml
 
 
 def get_bvId(url):
@@ -182,5 +182,5 @@ def get_data(reply_info):
         "blink": blink,
         "summarized_text": summarized_text
     }, bvid=bvid)
-    print("保存成功：bvid",result)
+    print("保存成功：bvid", result)
     return True

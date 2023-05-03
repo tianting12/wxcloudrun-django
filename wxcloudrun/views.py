@@ -49,8 +49,9 @@ def my_view(request):
     xml_str = ET.tostring(xml_tree)
 
     xml_str = pack_msg(da, "nihao")
+    print(xml_str)
     # 返回HTTP响应
-    return HttpResponse(xml_str, content_type='application/xml')
+    return HttpResponse(xml_str,)
 
 
 def bili_summary(request):
@@ -71,7 +72,7 @@ def bili_summary(request):
 
         xml_str = pack_msg(reply_info, summarized_text)
 
-        return HttpResponse(xml_str, content_type='application/xml')
+        return HttpResponse(xml_str,)
     else:
         # 异步任务，处理接收到的消息
         get_data(reply_info)
