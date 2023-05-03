@@ -85,8 +85,7 @@ def chat(text, ):
              '注意，你需要理解并概括原始文本中的主要信息和关键点，并将其转化成易于理解和记忆的形式。' \
              '同时，请确保你所提供的摘要准确反映了原始文本中所述内容。'
     openai.api_key = os.environ.get("API_KEY")
-    openai.api_key = os.environ.get("API_BASE")
-
+    openai.api_base = os.environ.get("API_BASE")
     completions = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
         messages=[
