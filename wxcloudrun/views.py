@@ -51,7 +51,9 @@ def my_view(request):
 
 
 def chat1(request):
+
     reply_info = json.loads(request.body)
+    print(reply_info)
     blink = reply_info["Content"]
     check = is_bilibili_link(blink)
     if not check:
