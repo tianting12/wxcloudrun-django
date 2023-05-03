@@ -112,6 +112,7 @@ def pack_msg(reply_info: dict, msg: str) -> str:
                     <Content><![CDATA[{msg}]]></Content>
                 </xml>
                 '''
+    print(str(reply_xml))
     return reply_xml
 
 

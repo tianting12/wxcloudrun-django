@@ -36,9 +36,7 @@ def my_view(request):
     # 构造XML元素树
     da = json.loads(request.body)
     xml_str = pack_msg(da, "nihao")
-    print(xml_str)
-    # 返回HTTP响应
-    return HttpResponse(xml_str, )
+    return HttpResponse(xml_str)
 
 
 def bili_summary(request):
