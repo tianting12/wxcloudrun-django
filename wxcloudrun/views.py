@@ -50,7 +50,7 @@ def my_view(request):
     return HttpResponse(xml_str, content_type='application/xml')
 
 
-def chat1(request):
+def bili_summary(request):
     reply_info = json.loads(request.body)
     print("reply_info", reply_info)
     if not reply_info:

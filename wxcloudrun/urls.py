@@ -27,5 +27,5 @@ urlpatterns = (
     # 获取主页
     url(r'api/demo?$', views.demo),
     url(r'api/demo2?$', views.my_view),
-    url(r'api/chat1?$', views.chat1),
+    url(r'api/bili_summary$', views.bili_summary),
 )
