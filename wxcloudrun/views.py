@@ -50,8 +50,8 @@ def bili_summary(request):
 
     if BilibiliVideo.objects.filter(bvid=bvid).exists():
         summarized_text = BilibiliVideo.objects.get(bvid=bvid).summarized_text
-
         replyMsg = TextMsg(reply_info["FromUserName"], reply_info["ToUserName"], summarized_text)
+        print(replyMsg)
         return HttpResponse(replyMsg.send(), content_type="application/xml")
     else:
         # 异步任务，处理接收到的消息
