@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 import time
@@ -9,8 +8,7 @@ import xml.etree.ElementTree as ET
 from django.http import HttpResponse
 
 from wxcloudrun.models import BilibiliVideo
-from wxcloudrun.util import chat, pack_msg, is_bilibili_link, get_bvId, bili_player_list, bili_subtitle, segTranscipt, \
-    get_data
+from wxcloudrun.util import  pack_msg, is_bilibili_link, get_bvId, get_data
 
 logger = logging.getLogger('log')
 
