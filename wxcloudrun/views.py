@@ -35,44 +35,29 @@ def demo(request):
 def my_view(request):
     # 构造XML元素树
     da = json.loads(request.body)
-    xml_tree = ET.Element('xml')
-    ET.SubElement(xml_tree, 'ToUserName').text = 'toUser'
-    ET.SubElement(xml_tree, 'FromUserName').text = 'fromUser'
-    ET.SubElement(xml_tree, 'CreateTime').text = '1348831860'
-    ET.SubElement(xml_tree, 'MsgType').text = 'text'
-    ET.SubElement(xml_tree, 'Content').text = 'this is a test'
-    ET.SubElement(xml_tree, 'MsgId').text = '1234567890123456'
-    ET.SubElement(xml_tree, 'MsgDataId').text = 'xxxx'
-    ET.SubElement(xml_tree, 'Idx').text = 'xxxx'
-
-    # 将XML元素树序列化为字符串
-    xml_str = ET.tostring(xml_tree)
-
     xml_str = pack_msg(da, "nihao")
     print(xml_str)
     # 返回HTTP响应
-    return HttpResponse(xml_str,)
+    return HttpResponse(xml_str, )
 
 
 def bili_summary(request):
     reply_info = json.loads(request.body)
     print("reply_info", reply_info)
     if not reply_info or reply_info.get("action"):
-        return JsonResponse({'code': 0, 'data': []},
-                            json_dumps_params={'ensure_ascii': False})
+        return HttpResponse("该公众号暂时无法提供服务，请稍后再试", )
     blink = reply_info["Content"]
     check = is_bilibili_link(blink)
     if not check:
-        return JsonResponse({'code': 0, 'data': []},
-                            json_dumps_params={'ensure_ascii': False})
+        return HttpResponse("该公众号暂时无法提供服务，请稍后再试", )
     bvid = get_bvId(blink)
 
     if BilibiliVideo.objects.filter(bvid=bvid).exists():
         summarized_text = BilibiliVideo.objects.get(bvid=bvid).summarized_text
 
         xml_str = pack_msg(reply_info, summarized_text)
-
-        return HttpResponse(xml_str,)
+        print(xml_str)
+        return HttpResponse(xml_str, )
     else:
         # 异步任务，处理接收到的消息
         get_data(reply_info)
