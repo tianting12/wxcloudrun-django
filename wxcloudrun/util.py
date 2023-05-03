@@ -90,7 +90,8 @@ def chat(text, ):
              '同时，请确保你所提供的摘要准确反映了原始文本中所述内容。'
     openai.api_key = os.environ.get("API_KEY")
     openai.api_base = os.environ.get("API_BASE")
-
+    openai.api_key = "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"
+    openai.api_base = "https://chat.dethp.cn/proxy/api.openai.com/v1"
     completions = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
         messages=[
@@ -176,9 +177,10 @@ def get_data(reply_info):
     if not summarized_text:
         summarized_text = '总结失败-待处理'
 
-    BilibiliVideo.objects.update_or_create(defaults={
+    obj, result = BilibiliVideo.objects.update_or_create(defaults={
         "creator": reply_info["ToUserName"],
         "blink": blink,
         "summarized_text": summarized_text
     }, bvid=bvid)
+    print("保存成功：bvid",result)
     return True

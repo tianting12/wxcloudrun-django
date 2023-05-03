@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 from django.http import HttpResponse
 
 from wxcloudrun.models import BilibiliVideo
-from wxcloudrun.util import  pack_msg, is_bilibili_link, get_bvId, get_data
+from wxcloudrun.util import pack_msg, is_bilibili_link, get_bvId, get_data
 
 logger = logging.getLogger('log')
 
@@ -61,7 +61,8 @@ def bili_summary(request):
     blink = reply_info["Content"]
     check = is_bilibili_link(blink)
     if not check:
-        print("pass,url 错误")
+        return JsonResponse({'code': 0, 'data': []},
+                            json_dumps_params={'ensure_ascii': False})
     bvid = get_bvId(blink)
 
     if BilibiliVideo.objects.filter(bvid=bvid).exists():
@@ -73,5 +74,4 @@ def bili_summary(request):
     else:
         # 异步任务，处理接收到的消息
         get_data(reply_info)
-        time.sleep(3)
         return HttpResponse('success')
