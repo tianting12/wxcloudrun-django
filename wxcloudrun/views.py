@@ -53,7 +53,7 @@ def my_view(request):
 def bili_summary(request):
     reply_info = json.loads(request.body)
     print("reply_info", reply_info)
-    if not reply_info:
+    if not reply_info or reply_info.get("action"):
         return JsonResponse({'code': 0, 'data': []},
                             json_dumps_params={'ensure_ascii': False})
     blink = reply_info["Content"]
