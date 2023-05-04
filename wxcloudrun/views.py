@@ -80,8 +80,12 @@ def TencentView(request):
         webData = request.body
 
         xmlData = ElementTree.fromstring(webData)
-        if json.loads(request.body).get("action"):
-            return HttpResponse("success", )
+        try:
+            if xmlData.find('action').text:
+                return HttpResponse("success")
+        except:
+            pass
+
         recMsg = ParseXmlMsg(xmlData)
         if recMsg.MsgType == 'text':
             toUser = recMsg.FromUserName
