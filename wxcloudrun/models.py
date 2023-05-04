@@ -22,6 +22,4 @@ class BilibiliVideo(models.Model):
 
     summarized_text = models.TextField()
 
-    status = models.CharField(max_length=50, choices=CHOICES, default="")
-
     # 视频内容，使用 TextField 类型。
