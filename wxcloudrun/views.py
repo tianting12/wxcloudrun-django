@@ -33,8 +33,6 @@ def my_view(request):
     # 构造XML元素树
     try:
         da = json.loads(request.body)
-        reply = create_reply("ddd", da)
-        print(reply)
         return HttpResponse()
     except Exception as e:
         print(e)
