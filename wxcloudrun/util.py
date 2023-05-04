@@ -182,7 +182,7 @@ def get_data(reply_info):
         "summarized_text": summarized_text
     }, bvid=bvid)
     print("保存成功：bvid", result)
-    send(reply_info["FromUserName"],summarized_text)
+    send(reply_info["FromUserName"], summarized_text)
     return True
 
 
@@ -197,5 +197,5 @@ def send(openid, content, type="text"):
                 "content": content
             }
     }
-    response = requests.post(url, data=data)
+    response = requests.post(url, data=data, verify=False)
     print("主动消息推送openid", response.json())
