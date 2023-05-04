@@ -154,6 +154,14 @@ def get_data(recMsg: ParseXmlMsg):
     cid, title = bili_player_list(bvid)
     transcript_text = bili_subtitle(bvid, cid)
     summarized_text = ''
+
+    obj, result = BilibiliVideo.objects.update_or_create(defaults={
+        "creator": recMsg.FromUserName,
+        "blink": blink,
+        "summarized_text": summarized_text,
+        "status": "running"
+    }, bvid=bvid)
+
     if transcript_text:
         print('字幕获取成功')
         seged_text = segTranscipt(transcript_text)
@@ -176,12 +184,7 @@ def get_data(recMsg: ParseXmlMsg):
 
     if not summarized_text:
         summarized_text = '总结失败-待处理'
-
-    obj, result = BilibiliVideo.objects.update_or_create(defaults={
-        "creator": recMsg.FromUserName,
-        "blink": blink,
-        "summarized_text": summarized_text
-    }, bvid=bvid)
+    obj.summarized_text = summarized_text
+    obj.save()
     print("保存成功：bvid", result)
     return True
-

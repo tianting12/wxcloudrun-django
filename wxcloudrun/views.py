@@ -108,7 +108,8 @@ def TencentView(request):
                 # 异步任务，处理接收到的消息
                 get_data(recMsg)
                 print('后台处理中')
-                # return HttpResponse(content='success')
+                time.sleep(6)
+                return HttpResponse(content='success')
 
         elif recMsg.MsgType == 'image':
             toUser = recMsg.FromUserName
