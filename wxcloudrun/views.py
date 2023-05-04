@@ -76,8 +76,12 @@ def TencentView(request):
             return HttpResponse(content='验证失败')
 
     elif request.method == 'POST':
+
         webData = request.body
+
         xmlData = ElementTree.fromstring(webData)
+        if json.loads(request.body).get("action"):
+            return HttpResponse("success", )
         recMsg = ParseXmlMsg(xmlData)
         if recMsg.MsgType == 'text':
             toUser = recMsg.FromUserName
