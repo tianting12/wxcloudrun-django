@@ -197,5 +197,6 @@ def send(openid, content, type="text"):
                 "content": content
             }
     }
-    response = requests.post(url, data=data,)
-    print("主动消息推送openid", response.json())
+    response = requests.post(url, data=data, )
+    print("主动消息推送header:", response.headers)
+    print("主动消息推送openid:", response.json())
