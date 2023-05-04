@@ -90,34 +90,49 @@ def TencentView(request):
         if recMsg.MsgType == 'text':
             toUser = recMsg.FromUserName
             fromUser = recMsg.ToUserName
-            content = 'test'
+            blink = recMsg.Content
+            # 检查是否是blibii链接
+            check = is_bilibili_link(blink)
+            if not check:
+                content = "请输入b站链接"
+                replyMsg = TextMsg(toUser, fromUser, content)
+                return HttpResponse(content=replyMsg.send())
 
-            replyMsg = TextMsg(toUser, fromUser, content)
-            return HttpResponse(content=replyMsg.send())
+            bvid = get_bvId(blink)
+            if BilibiliVideo.objects.filter(bvid=bvid).exists():
+                content = BilibiliVideo.objects.get(bvid=bvid).summarized_text
+                replyMsg = TextMsg(toUser, fromUser, content)
+                return HttpResponse(content=replyMsg.send())
+            else:
+                # 异步任务，处理接收到的消息
+                get_data(recMsg)
+                print('后台处理中')
+                time.sleep(2)
+                return HttpResponse(content='success')
+
         elif recMsg.MsgType == 'image':
             print('暂时不做处理')
             return HttpResponse(content='success')
 
 
 def bili_summary(request):
-    reply_info = json.loads(request.body)
-    print("reply_info", reply_info)
-    if not reply_info or reply_info.get("action"):
-        return HttpResponse("success", content_type="application/xml")
-    blink = reply_info["Content"]
-    check = is_bilibili_link(blink)
-    if not check:
-        return HttpResponse("success", content_type="application/xml")
-    bvid = get_bvId(blink)
-
-    if BilibiliVideo.objects.filter(bvid=bvid).exists():
-        summarized_text = BilibiliVideo.objects.get(bvid=bvid).summarized_text
-        # replyMsg = TextMsg(reply_info["FromUserName"], reply_info["ToUserName"], summarized_text)
-        # return HttpResponse(replyMsg.send(), content_type="application/xml")
-        send(reply_info["FromUserName"], summarized_text)
-        return HttpResponse("success", )
-    else:
-        # 异步任务，处理接收到的消息
-        get_data(reply_info)
-        time.sleep(2)
-        return HttpResponse('success', content_type="application/xml")
+    pass
+    # reply_info = json.loads(request.body)
+    # print("reply_info", reply_info)
+    # if not reply_info or reply_info.get("action"):
+    #     return HttpResponse("success", content_type="application/xml")
+    # blink = reply_info["Content"]
+    # check = is_bilibili_link(blink)
+    # if not check:
+    #     return HttpResponse("success", content_type="application/xml")
+    # bvid = get_bvId(blink)
+    #
+    # if BilibiliVideo.objects.filter(bvid=bvid).exists():
+    #     summarized_text = BilibiliVideo.objects.get(bvid=bvid).summarized_text
+    #     TextMsg(toUser, fromUser, content)
+    #     return HttpResponse("success", )
+    # else:
+    #     # 异步任务，处理接收到的消息
+    #     get_data(reply_info)
+    #     time.sleep(2)
+    #     return HttpResponse('success', content_type="application/xml")

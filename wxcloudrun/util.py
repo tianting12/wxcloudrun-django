@@ -9,6 +9,7 @@ import validators
 import xmltodict
 
 from wxcloudrun.models import BilibiliVideo
+from wxcloudrun.receive import ParseXmlMsg
 
 headers = {
     "Cookie": "buvid3=624DC525-E7B5-0416-1735-7CD7AF68A3A245957infoc; i-wanna-go-back=-1; _uuid=D812FC103-1B8D-288E-A16A-D395A6581082645694infoc; buvid4=505CDFDF-0FEE-9CD2-F219-129A152C10CA46623-022071123-cWZGbE4cldom6m5ltwQ11A==; buvid_fp_plain=undefined; LIVE_BUVID=AUTO5716575551770605; CURRENT_BLACKGAP=0; DedeUserID=361453208; DedeUserID__ckMd5=4cb1e81e3095816d; nostalgia_conf=-1; blackside_state=0; b_ut=5; is-2022-channel=1; fingerprint3=adff839f4ad592c1c87e6205cb0ef759; hit-dyn-v2=1; b_nut=100; rpdid=|(k|k)~u|mYR0J'uYY)mullYu; CURRENT_QUALITY=120; header_theme_version=CLOSE; home_feed_column=5; CURRENT_FNVAL=4048; CURRENT_PID=d6815990-cf09-11ed-9502-f922cc9137c4; FEED_LIVE_VERSION=V8; browser_resolution=2560-1289; hit-new-style-dyn=0; bsource=search_baidu; fingerprint=606cee3cf376d013849ff9b45826538d; buvid_fp=606cee3cf376d013849ff9b45826538d; PVID=1; bp_video_offset_361453208=790810144955957200; b_lsid=31E107EA1_187E1669532; innersign=1; SESSDATA=e5a3fb70,1698666620,a4a5f*51; bili_jct=82382050fc93baec7f533ee817d829dc; sid=7mkgefpx"
@@ -146,8 +147,8 @@ def background_thread(func):
 
 
 @background_thread
-def get_data(reply_info):
-    blink = reply_info["Content"]
+def get_data(recMsg: ParseXmlMsg):
+    blink = recMsg.Content
     bvid = get_bvId(blink)
 
     cid, title = bili_player_list(bvid)
@@ -177,26 +178,10 @@ def get_data(reply_info):
         summarized_text = '总结失败-待处理'
 
     obj, result = BilibiliVideo.objects.update_or_create(defaults={
-        "creator": reply_info["ToUserName"],
+        "creator": recMsg.FromUserName,
         "blink": blink,
         "summarized_text": summarized_text
     }, bvid=bvid)
     print("保存成功：bvid", result)
-    send(reply_info["FromUserName"], summarized_text)
     return True
 
-
-def send(openid, content, type="text"):
-    url = "http://api.weixin.qq.com/cgi-bin/message/custom/send?from_appid=wx344688afd87bbe7b"
-
-    data = {
-        "touser": openid,
-        "msgtype": type,
-        "text":
-            {
-                "content": content
-            }
-    }
-    response = requests.post(url, data=data, )
-    print("主动消息推送header:", response.headers)
-    print("主动消息推送openid:", response.json())
