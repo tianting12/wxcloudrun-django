@@ -55,7 +55,7 @@ def bili_summary(request):
         # replyMsg = TextMsg(reply_info["FromUserName"], reply_info["ToUserName"], summarized_text)
         # return HttpResponse(replyMsg.send(), content_type="application/xml")
         send(reply_info["FromUserName"], summarized_text)
-        return HttpResponse("success",)
+        return HttpResponse("success", )
     else:
         # 异步任务，处理接收到的消息
         get_data(reply_info)
