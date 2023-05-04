@@ -9,7 +9,7 @@ from django.http import HttpResponse
 
 from wxcloudrun.models import BilibiliVideo
 from wxcloudrun.receive import ParseXmlMsg
-from wxcloudrun.util import  is_bilibili_link, get_bvId, get_data
+from wxcloudrun.util import is_bilibili_link, get_bvId, get_data
 from wxcloudrun.replay import TextMsg
 
 logger = logging.getLogger('log')
@@ -85,9 +85,9 @@ def TencentView(request):
             pass
 
         recMsg = ParseXmlMsg(xmlData)
+        toUser = recMsg.FromUserName
+        fromUser = recMsg.ToUserName
         if recMsg.MsgType == 'text':
-            toUser = recMsg.FromUserName
-            fromUser = recMsg.ToUserName
             blink = recMsg.Content
             # 检查是否是blibii链接
             print(blink)
@@ -108,11 +108,12 @@ def TencentView(request):
                 # 异步任务，处理接收到的消息
                 get_data(recMsg)
                 print('后台处理中')
-                time.sleep(2)
-                return HttpResponse(content='success')
+                # return HttpResponse(content='success')
 
         elif recMsg.MsgType == 'image':
-            print('暂时不做处理')
+            toUser = recMsg.FromUserName
+            fromUser = recMsg.ToUserName
+            replyMsg = TextMsg(toUser, fromUser, "查询中")
             return HttpResponse(content='success')
 
 

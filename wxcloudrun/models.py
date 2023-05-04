@@ -2,6 +2,13 @@ from django.db import models
 
 
 class BilibiliVideo(models.Model):
+    CHOICES = (
+        ('failed', '总结失败'),
+        ('successd', '总结成功'),
+        ('running', '正在总结'),
+        ('ignore', '正在总结')
+    )
+
     bvid = models.CharField(max_length=20, unique=True)
     # 视频 BV 号，使用 CharField 类型，并设置最大长度为 20，唯一不重复
 
@@ -14,5 +21,7 @@ class BilibiliVideo(models.Model):
     # 视频创作者，使用 CharField 类型，并设置最大长度为 50。
 
     summarized_text = models.TextField()
+
+    status = models.CharField(max_length=50, choices=CHOICES, default="")
 
     # 视频内容，使用 TextField 类型。
