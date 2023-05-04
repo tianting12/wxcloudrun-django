@@ -111,14 +111,14 @@ def TencentView(request):
                     pass
                 else:
                     get_data(recMsg)
-                time.sleep(6)
-                return HttpResponse(content='success')
+                time.sleep(4)
+                return HttpResponse(content='dd')
 
         elif recMsg.MsgType == 'image':
             toUser = recMsg.FromUserName
             fromUser = recMsg.ToUserName
             replyMsg = TextMsg(toUser, fromUser, "查询中")
-            return HttpResponse(content='success')
+            return HttpResponse(content='dd')
 
 
 def bili_summary(request):
