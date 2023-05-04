@@ -74,7 +74,7 @@ def segTranscipt(transcript):
                   enumerate(transcript)]
     text = " ".join([x["text"] for x in sorted(transcript, key=lambda x: x["index"])])
     length = len(text)
-    seg_length = 3500
+    seg_length = 2000
     n = length // seg_length + 1
     print(f"视频文本共{length}字, 分为{n}部分进行摘要")
     division = len(transcript) // n
