@@ -4,14 +4,12 @@ import logging
 import time
 from xml.etree import ElementTree
 
-from django.http import JsonResponse
 from django.shortcuts import render
-import xml.etree.ElementTree as ET
 from django.http import HttpResponse
 
 from wxcloudrun.models import BilibiliVideo
 from wxcloudrun.receive import ParseXmlMsg
-from wxcloudrun.util import pack_msg, is_bilibili_link, get_bvId, get_data, send
+from wxcloudrun.util import  is_bilibili_link, get_bvId, get_data
 from wxcloudrun.replay import TextMsg
 
 logger = logging.getLogger('log')
