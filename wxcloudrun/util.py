@@ -12,8 +12,7 @@ from wxcloudrun.models import BilibiliVideo
 from wxcloudrun.receive import ParseXmlMsg
 
 headers = {
-    "Cookie": "buvid3=624DC525-E7B5-0416-1735-7CD7AF68A3A245957infoc; i-wanna-go-back=-1; _uuid=D812FC103-1B8D-288E-A16A-D395A6581082645694infoc; buvid4=505CDFDF-0FEE-9CD2-F219-129A152C10CA46623-022071123-cWZGbE4cldom6m5ltwQ11A==; buvid_fp_plain=undefined; LIVE_BUVID=AUTO5716575551770605; CURRENT_BLACKGAP=0; DedeUserID=361453208; DedeUserID__ckMd5=4cb1e81e3095816d; nostalgia_conf=-1; blackside_state=0; b_ut=5; is-2022-channel=1; fingerprint3=adff839f4ad592c1c87e6205cb0ef759; hit-dyn-v2=1; b_nut=100; rpdid=|(k|k)~u|mYR0J'uYY)mullYu; CURRENT_QUALITY=120; header_theme_version=CLOSE; home_feed_column=5; CURRENT_FNVAL=4048; CURRENT_PID=d6815990-cf09-11ed-9502-f922cc9137c4; FEED_LIVE_VERSION=V8; browser_resolution=2560-1289; hit-new-style-dyn=0; bsource=search_baidu; fingerprint=606cee3cf376d013849ff9b45826538d; buvid_fp=606cee3cf376d013849ff9b45826538d; PVID=1; bp_video_offset_361453208=790810144955957200; b_lsid=31E107EA1_187E1669532; innersign=1; SESSDATA=e5a3fb70,1698666620,a4a5f*51; bili_jct=82382050fc93baec7f533ee817d829dc; sid=7mkgefpx"
-}
+    "Cookie": "buvid3=624DC525-E7B5-0416-1735-7CD7AF68A3A245957infoc; i-wanna-go-back=-1; _uuid=D812FC103-1B8D-288E-A16A-D395A6581082645694infoc; buvid4=505CDFDF-0FEE-9CD2-F219-129A152C10CA46623-022071123-cWZGbE4cldom6m5ltwQ11A==; buvid_fp_plain=undefined; LIVE_BUVID=AUTO5716575551770605; CURRENT_BLACKGAP=0; DedeUserID=361453208; DedeUserID__ckMd5=4cb1e81e3095816d; nostalgia_conf=-1; blackside_state=0; b_ut=5; is-2022-channel=1; fingerprint3=adff839f4ad592c1c87e6205cb0ef759; hit-dyn-v2=1; b_nut=100; rpdid=|(k|k)~u|mYR0J'uYY)mullYu; CURRENT_QUALITY=120; header_theme_version=CLOSE; home_feed_column=5; CURRENT_FNVAL=4048; CURRENT_PID=d6815990-cf09-11ed-9502-f922cc9137c4; FEED_LIVE_VERSION=V8; browser_resolution=2560-1289; hit-new-style-dyn=0; fingerprint=606cee3cf376d013849ff9b45826538d; share_source_origin=WEIXIN; bsource=share_source_weixinchat; buvid_fp=606cee3cf376d013849ff9b45826538d; PVID=2; bp_video_offset_361453208=791493890864578600; innersign=1; b_lsid=AF91F8A2_187E6BC7856; SESSDATA=951be216,1698757286,67b99*51; bili_jct=f5209f33d7e503f09221ed32d90a8071; sid=nnlk60dw"}
 
 
 def bili_info(bvid):
@@ -62,7 +61,6 @@ def bili_subtitle_list(bvid, cid):
 
 def bili_subtitle(bvid, cid):
     subtitles = bili_subtitle_list(bvid, cid)
-    print(subtitles)
     if subtitles:
         response = requests.get(subtitles[0])
         if response.status_code == 200:
@@ -91,6 +89,8 @@ def chat(text, ):
              '同时，请确保你所提供的摘要准确反映了原始文本中所述内容。'
     openai.api_key = os.environ.get("API_KEY")
     openai.api_base = os.environ.get("API_BASE")
+    openai.api_key = "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"
+    openai.api_base = "https://chat.dethp.cn/proxy/api.openai.com/v1"
     completions = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
         messages=[
@@ -119,7 +119,6 @@ def pack_msg(reply_info: dict, msg: str) -> str:
 
 def get_bvId(url):
     parsed_url = urlparse(url)
-    print(parsed_url)
     bvid = parsed_url.path.split('/')[-1]
     if not bvid:
         bvid = parsed_url.path.split('/')[-2]
@@ -178,13 +177,13 @@ def get_data(recMsg: ParseXmlMsg):
                 print('GPT接口摘要失败, 请检查网络连接', e)
                 response = '摘要失败'
             summarized_text += '\n' + response
-        # insert2notion(token, database_id, bvid, summarized_text)
     else:
         print('字幕获取失败')
 
     if not summarized_text:
         summarized_text = '总结失败-待处理'
     obj.summarized_text = summarized_text
+    obj.status = "success"
     obj.save()
     print("保存成功：bvid", result)
     return True

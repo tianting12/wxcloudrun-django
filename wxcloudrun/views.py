@@ -78,6 +78,7 @@ def TencentView(request):
         webData = request.body
 
         xmlData = ElementTree.fromstring(webData)
+        print(ElementTree.tostring(xmlData))
         try:
             if xmlData.find('action').text:
                 return HttpResponse("success")
@@ -99,15 +100,17 @@ def TencentView(request):
                 return HttpResponse(content=replyMsg.send())
 
             bvid = get_bvId(blink)
-            if BilibiliVideo.objects.filter(bvid=bvid).exists():
+            if BilibiliVideo.objects.filter(bvid=bvid, ).exclude(status="running").exists():
                 content = BilibiliVideo.objects.get(bvid=bvid).summarized_text
                 replyMsg = TextMsg(toUser, fromUser, content)
-                print("回复内容：", replyMsg)
+                print("回复内容：", replyMsg.send())
                 return HttpResponse(content=replyMsg.send())
             else:
                 # 异步任务，处理接收到的消息
-                get_data(recMsg)
-                print('后台处理中')
+                if BilibiliVideo.objects.filter(bvid=bvid).exists():
+                    pass
+                else:
+                    get_data(recMsg)
                 time.sleep(6)
                 return HttpResponse(content='success')
 
