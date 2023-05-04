@@ -6,7 +6,6 @@ from django.http import JsonResponse
 from django.shortcuts import render
 import xml.etree.ElementTree as ET
 from django.http import HttpResponse
-from wechatpy import create_reply, parse_message
 
 from wxcloudrun.models import BilibiliVideo
 from wxcloudrun.util import pack_msg, is_bilibili_link, get_bvId, get_data, send
