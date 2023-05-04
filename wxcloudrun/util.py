@@ -187,7 +187,7 @@ def get_data(reply_info):
 
 
 def send(openid, content, type="text"):
-    url = "https://api.weixin.qq.com/cgi-bin/message/custom/send"
+    url = "http://api.weixin.qq.com/cgi-bin/message/custom/send?from_appid=wx344688afd87bbe7b"
 
     data = {
         "touser": openid,
@@ -197,5 +197,5 @@ def send(openid, content, type="text"):
                 "content": content
             }
     }
-    response = requests.post(url, data=data, verify=False)
+    response = requests.post(url, data=data,)
     print("主动消息推送openid", response.json())
