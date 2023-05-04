@@ -95,6 +95,7 @@ def TencentView(request):
             check = is_bilibili_link(blink)
             if not check:
                 content = "请输入b站链接"
+                print("回复内容：请输入b站链接")
                 replyMsg = TextMsg(toUser, fromUser, content)
                 return HttpResponse(content=replyMsg.send())
 
@@ -102,6 +103,7 @@ def TencentView(request):
             if BilibiliVideo.objects.filter(bvid=bvid).exists():
                 content = BilibiliVideo.objects.get(bvid=bvid).summarized_text
                 replyMsg = TextMsg(toUser, fromUser, content)
+                print("回复内容：", replyMsg)
                 return HttpResponse(content=replyMsg.send())
             else:
                 # 异步任务，处理接收到的消息
