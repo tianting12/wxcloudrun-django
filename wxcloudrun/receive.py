@@ -1,20 +1,8 @@
-# -*- coding: utf-8 -*-#
-# filename: receive.py
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree
+import time
 
 
-def parse_xml(web_data):
-    if len(web_data) == 0:
-        return None
-    xmlData = ET.fromstring(web_data)
-    msg_type = xmlData.find('MsgType').text
-    if msg_type == 'text':
-        return TextMsg(xmlData)
-    elif msg_type == 'image':
-        return ImageMsg(xmlData)
-
-
-class Msg(object):
+class ParseXmlMsg(object):
     def __init__(self, xmlData):
         self.ToUserName = xmlData.find('ToUserName').text
         self.FromUserName = xmlData.find('FromUserName').text
@@ -22,15 +10,53 @@ class Msg(object):
         self.MsgType = xmlData.find('MsgType').text
         self.MsgId = xmlData.find('MsgId').text
 
+        if self.MsgType == 'text':
+            self.Content = xmlData.find('Content').text.encode('utf-8')
+        elif self.MsgType == 'image':
+            self.PicUrl = xmlData.find('PicUrl').text
+            self.MediaId = xmlData.find('MediaId').text
 
-class TextMsg(Msg):
-    def __init__(self, xmlData):
-        Msg.__init__(self, xmlData)
-        self.Content = xmlData.find('Content').text.encode("utf-8")
+
+class TextMsg(object):
+    def __init__(self, toUserName, fromUserName, content):
+        # 私有对象，禁止外部访问
+        self.__dict = dict()
+        self.__dict['ToUserName'] = toUserName
+        self.__dict['FromUserName'] = fromUserName
+        self.__dict['CreateTime'] = int(time.time())
+        self.__dict['Content'] = content
+
+    def send(self):
+        XmlForm = """
+            <xml>
+                <ToUserName><![CDATA[{ToUserName}]]></ToUserName>
+                <FromUserName><![CDATA[{FromUserName}]]></FromUserName>
+                <CreateTime>{CreateTime}</CreateTime>
+                <MsgType><![CDATA[text]]></MsgType>
+                <Content><![CDATA[{Content}]]></Content>
+            </xml>
+            """
+        return XmlForm.format(**self.__dict)
 
 
-class ImageMsg(Msg):
-    def __init__(self, xmlData):
-        Msg.__init__(self, xmlData)
-        self.PicUrl = xmlData.find('PicUrl').text
-        self.MediaId = xmlData.find('MediaId').text
+class ImageMsg(object):
+    def __init__(self, toUserName, fromUserName, mediaId):
+        self.__dict = dict()
+        self.__dict['ToUserName'] = toUserName
+        self.__dict['FromUserName'] = fromUserName
+        self.__dict['CreateTime'] = int(time.time())
+        self.__dict['MediaId'] = mediaId
+
+    def send(self):
+        XmlForm = """
+            <xml>
+                <ToUserName><![CDATA[{ToUserName}]]></ToUserName>
+                <FromUserName><![CDATA[{FromUserName}]]></FromUserName>
+                <CreateTime>{CreateTime}</CreateTime>
+                <MsgType><![CDATA[image]]></MsgType>
+                <Image>
+                <MediaId><![CDATA[{MediaId}]]></MediaId>
+                </Image>
+            </xml>
+            """
+        return XmlForm.format(**self.__dict)
