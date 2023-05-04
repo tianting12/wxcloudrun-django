@@ -90,6 +90,7 @@ def TencentView(request):
             fromUser = recMsg.ToUserName
             blink = recMsg.Content
             # 检查是否是blibii链接
+            print(blink)
             check = is_bilibili_link(blink)
             if not check:
                 content = "请输入b站链接"

@@ -11,7 +11,7 @@ class ParseXmlMsg(object):
         self.MsgId = xmlData.find('MsgId').text
 
         if self.MsgType == 'text':
-            self.Content = xmlData.find('Content').text.encode('utf-8')
+            self.Content = xmlData.find('Content').text
         elif self.MsgType == 'image':
             self.PicUrl = xmlData.find('PicUrl').text
             self.MediaId = xmlData.find('MediaId').text
