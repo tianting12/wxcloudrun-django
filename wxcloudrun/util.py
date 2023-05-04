@@ -89,8 +89,6 @@ def chat(text, ):
              '同时，请确保你所提供的摘要准确反映了原始文本中所述内容。'
     openai.api_key = os.environ.get("API_KEY")
     openai.api_base = os.environ.get("API_BASE")
-    openai.api_key = "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"
-    openai.api_base = "https://chat.dethp.cn/proxy/api.openai.com/v1"
     completions = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
         messages=[
