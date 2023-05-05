@@ -77,8 +77,8 @@ def TencentView(request):
                 print("回复内容：请输入b站链接")
                 replyMsg = TextMsg(toUser, fromUser, content)
                 return HttpResponse(content=replyMsg.send())
-
             bvid = get_bvId(blink)
+            print("BVID:", bvid)
             if BilibiliVideo.objects.filter(bvid=bvid, status="success").exists():
                 obj = BilibiliVideo.objects.get(bvid=bvid)
                 replyMsg = TextMsg(toUser, fromUser, obj.summarized_text)
