@@ -100,7 +100,7 @@ def TencentView(request):
                 return HttpResponse(content=replyMsg.send())
 
             bvid = get_bvId(blink)
-            if BilibiliVideo.objects.filter(bvid=bvid, ).exclude(status="running").exists():
+            if BilibiliVideo.objects.filter(bvid=bvid, status="success").exists():
                 content = BilibiliVideo.objects.get(bvid=bvid).summarized_text
                 replyMsg = TextMsg(toUser, fromUser, content)
                 print("回复内容：", replyMsg.send())
@@ -111,7 +111,8 @@ def TencentView(request):
                     pass
                 else:
                     get_data(recMsg)
-                time.sleep(4)
+                time.sleep(2)
+                print("跳过等待")
                 return HttpResponse(content='dd')
 
         elif recMsg.MsgType == 'image':
